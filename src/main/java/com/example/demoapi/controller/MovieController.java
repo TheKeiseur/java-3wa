@@ -1,7 +1,8 @@
 package com.example.demoapi.controller;
 
 import com.example.demoapi.model.Movie;
-import com.example.demoapi.repository.MovieRepository;
+import com.example.demoapi.service.GetMovieService;
+import com.example.demoapi.service.SaveMovieService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,12 +17,14 @@ import java.util.List;
 public class MovieController {
 
     @Autowired
-    private MovieRepository movieRepository;
+    private GetMovieService getMovieService;
+    @Autowired
+    private SaveMovieService saveMovieService;
 
     @GetMapping("/movies")
     public String getMovies(Model model) {
 
-        List<Movie> movies = movieRepository.findAll();
+        List<Movie> movies = getMovieService.getMovies();
         model.addAttribute("movies", movies);
 
         return "home";
@@ -34,19 +37,15 @@ public class MovieController {
 
     @PostMapping("/movie")
     public String saveMovie(@RequestParam String title, @RequestParam Integer duration, @RequestParam String description) {
-        Movie movie = new Movie();
-        movie.setTitle(title);
-        movie.setDuration(duration);
-        movie.setDescription(description);
 
-        movieRepository.save(movie);
+        saveMovieService.saveMovie(title, duration, description);
 
-        return "home";
+        return "redirect:movies";
     }
 
     @DeleteMapping("/about/{id}")
     public String deleteById(@PathVariable Long id) {
-        movieRepository.deleteById(id);
+        //getMovieService.deleteById(id);
 
         return "home";
     }
