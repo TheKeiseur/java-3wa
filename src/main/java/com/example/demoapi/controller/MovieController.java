@@ -1,8 +1,7 @@
 package com.example.demoapi.controller;
 
 import com.example.demoapi.model.Movie;
-import com.example.demoapi.service.GetMovieService;
-import com.example.demoapi.service.SaveMovieService;
+import com.example.demoapi.service.MovieService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,14 +16,12 @@ import java.util.List;
 public class MovieController {
 
     @Autowired
-    private GetMovieService getMovieService;
-    @Autowired
-    private SaveMovieService saveMovieService;
+    private MovieService movieService;
 
     @GetMapping("/movies")
     public String getMovies(Model model) {
 
-        List<Movie> movies = getMovieService.getMovies();
+        List<Movie> movies = movieService.getMovies();
         model.addAttribute("movies", movies);
 
         return "home";
@@ -38,15 +35,22 @@ public class MovieController {
     @PostMapping("/movie")
     public String saveMovie(@RequestParam String title, @RequestParam Integer duration, @RequestParam String description) {
 
-        saveMovieService.saveMovie(title, duration, description);
+        movieService.saveMovie(title, duration, description);
 
         return "redirect:movies";
     }
 
     @DeleteMapping("/about/{id}")
-    public String deleteById(@PathVariable Long id) {
-        //getMovieService.deleteById(id);
+    public String deleteById(@PathVariable("id") Long id) {
+        movieService.deleteMovie(id);
 
-        return "home";
+        return "redirect:/catalog/movies";
+    }
+
+    @PutMapping("about/{id}")
+    public String updateById(@PathVariable("id") Long id) {
+        movieService.updateMovie(id);
+
+        return "redirect:/catalog/movies";
     }
 }
